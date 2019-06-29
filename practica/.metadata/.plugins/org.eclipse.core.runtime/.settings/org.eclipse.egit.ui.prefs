@@ -1,0 +1,4 @@
+commit_dialog_history_messages=<?xml version\="1.0" encoding\="UTF-8"?>\n<messages>\n<message>Se pudo unificar los ids (salvo los objects)</message>\n<message>Agregate @Properties</message>\n<message>Refactor neo4J</message>\n<message>Refactor neo4J (funcionamiento no probado)</message>\n<message>Refactor de sharding mongos</message>\n<message>Dejo funcionando para pruebas de mongo, redefinir jedis</message>\n<message>Update README.md</message>\n<message>ver c\u00F3mo hacer la suma para (jedis)\=&gt;Long to int y el fold de jedis</message>\n<message>Avanzando con el CarritoRedis</message>\n<message>Agregando Redis\: Analizar y agregar al carrito</message>\n</messages>
+eclipse.preferences.version=1
+resourcehistory_graph_split=500,500
+resourcehistory_rev_split=700,300

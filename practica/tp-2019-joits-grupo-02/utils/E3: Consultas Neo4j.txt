@@ -1,0 +1,22 @@
+//*************************************************
+// Entrega 3
+// Consultas Neo4j 
+//*************************************************
+
+
+// Saber qué amigos tienen mis amigos
+MATCH (usuario:Usuario)-[FRIENDS_WITH]->(amigo:Usuario)-[:FRIENDS_WITH]->(amigoDeAmigo:Usuario)
+WHERE usuario.name = 'cgarcia'
+RETURN amigo,amigoDeAmigo
+
+// Saber que películas de un género determinado no vi y mis amigos vieron
+MATCH (peliUsuario:Pelicula)<-[:MOVIES_SEEING]-(usuario:Usuario {name: 'cgarcia'})-[FRIENDS_WITH]->(amigo:Usuario)-[:MOVIES_SEEING]->(peliAmigo:Pelicula)
+WHERE NOT (peliUsuario.genero = peliAmigo.genero )
+RETURN peliAmigo
+
+// Saber qué película es la más vista
+MATCH (u:Usuario)-[r:MOVIES_SEEING]->(p:Pelicula)
+RETURN p , count(r)
+ORDER BY count(r) DESC LIMIT 1
+
+

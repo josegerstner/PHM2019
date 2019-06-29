@@ -1,0 +1,120 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+"-//Hibernate/Hibernate Mapping DTD//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+<!--	PUNTO 1  -->
+	<database-object>
+		<create>
+			CREATE VIEW
+					peliculas_con_entradas
+				AS
+					SELECT
+						p.id,
+						p.titulo,
+						p.anio,
+						p.genero,
+						p.puntaje
+					FROM
+						joits.Pelicula p
+					WHERE
+						(
+							SELECT
+								Count(*)
+							FROM
+								joits.Entrada e
+							WHERE e.pelicula_id = p.id
+						) >= 3;
+		</create>
+		<drop>
+			DROP VIEW peliculas_con_entradas;
+		</drop>
+		<dialect-scope name="org.hibernate.dialect.MySQL5InnoDBDialect"/>
+	</database-object>
+	<!-- 	PUNTO 2 -->
+	<database-object>
+		<create>
+			CREATE TABLE `joits`.`modificacion_pelicula` (
+			  `id` INT NOT NULL AUTO_INCREMENT,
+			  `fecha_modificacion` DATE NULL,
+			  `titulo_anterior` VARCHAR(100) NULL,
+			  `titulo_nuevo` VARCHAR(45) NULL,
+			  `pelicula_id` BIGINT(20) NOT NULL,
+			  PRIMARY KEY (`id`),
+			  INDEX `fk_pelicula_modificacion_idx` (`pelicula_id` ASC),
+			  CONSTRAINT `fk_pelicula_modificacion`
+			    FOREIGN KEY (`pelicula_id`)
+			    REFERENCES `joits`.`Pelicula` (`id`)
+			    ON DELETE NO ACTION
+			    ON UPDATE NO ACTION);
+		</create>
+		<drop>
+			DROP TABLE modificacion_pelicula;
+		</drop>
+		<dialect-scope name="org.hibernate.dialect.MySQL5InnoDBDialect"/>
+	</database-object>
+	<database-object>
+		<create>
+			CREATE TRIGGER Pelicula_AFTER_UPDATE AFTER UPDATE ON Pelicula FOR EACH ROW
+			BEGIN
+				INSERT INTO joits.modificacion_pelicula (
+							fecha_modificacion, 
+			                titulo_anterior, 
+			                titulo_nuevo,
+			                pelicula_id
+			                ) VALUES (
+								CURDATE(),
+			                    old.titulo,
+			                    new.titulo,
+			                    new.id
+			                );
+			END
+		</create>
+		<drop>
+			DROP TRIGGER Pelicula_AFTER_UPDATE;
+		</drop>
+		<dialect-scope name="org.hibernate.dialect.MySQL5InnoDBDialect"/>
+	</database-object>
+	<!-- 	PUNTO 3	 -->
+	<database-object>
+		<create>
+			CREATE PROCEDURE peliculas_accion_sala(IN sala varchar(100))
+			BEGIN
+			SELECT 
+				e.id,
+				p.titulo,
+				p.anio,
+				p.puntaje,
+				f.nombreSala
+			FROM 
+				joits.Entrada e
+			INNER JOIN
+				joits.Pelicula p ON e.pelicula_id = p.id
+			INNER JOIN
+				joits.Funcion f ON e.funcion_id = f.id
+			WHERE 
+				p.genero LIKE "%Action%"
+			AND 
+				f.nombreSala = sala;
+			END
+		</create>
+		<drop>
+			DROP PROCEDURE peliculas_accion_sala;
+		</drop>
+		<dialect-scope name="org.hibernate.dialect.MySQL5InnoDBDialect"/>
+	</database-object>
+	<!-- 	PUNTO 4	 -->
+	<database-object>
+		<create>
+			ALTER TABLE joits.Usuario
+			CHANGE COLUMN saldo saldo DOUBLE NOT NULL ;
+		</create>
+		<drop>
+			ALTER TABLE joits.Usuario
+			CHANGE COLUMN saldo saldo DOUBLE NULL ;
+		</drop>
+		<dialect-scope name="org.hibernate.dialect.MySQL5InnoDBDialect"/>
+	</database-object>
+	
+</hibernate-mapping>
